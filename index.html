@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validador de Cédula - Algoritmo Módulo 10</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .banner {
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      text-align: center;
+      padding: 15px 0;
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .contenedor {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 320px;
+      margin-top: 80px;
+      position: relative;
+    }
+
+    input {
+      padding: 10px;
+      width: 90%;
+      font-size: 16px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .loader {
+      display: none;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      animation: pop 0.3s ease;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .popup-content.correcta { border-left: 5px solid green; }
+    .popup-content.incorrecta { border-left: 5px solid red; }
+
+    .popup-content h3 {
+      margin: 10px 0;
+    }
+
+    .cerrar {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .cerrar:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="banner">
+    | Paginita para validar tu celula con el algoritmo modulo 10 |
+  </div>
+
+  <div class="contenedor">
+    <h2>Validar Cédula </h2>
+    <input type="text" id="cedula" placeholder="Ingrese su cédula" maxlength="13">
+    <br>
+    <button onclick="validarCedula()">Validar</button>
+    <div class="loader" id="loader"></div>
+  </div>
+
+  <!-- Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content" id="popupContent">
+      <h3 id="mensaje"></h3>
+      <button class="cerrar" onclick="cerrarPopup()">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    function validarCedula() {
+      const cedulaInput = document.getElementById("cedula");
+      let cedula = cedulaInput.value.trim();
+      const loader = document.getElementById("loader");
+      const popup = document.getElementById("popup");
+      const popupContent = document.getElementById("popupContent");
+      const mensaje = document.getElementById("mensaje");
+
+      // Eliminar guiones y espacios
+      cedula = cedula.replace(/[-\s]/g, '');
+
+      loader.style.display = "block";
+
+      setTimeout(() => {
+        loader.style.display = "none";
+
+        if (!/^\d{11}$/.test(cedula)) {
+          mensaje.textContent = " CÉDULA INCORRECTA ";
+          popupContent.className = "popup-content incorrecta";
+          popup.style.display = "flex";
+          return;
+        }
+
+        const cuerpo = cedula.slice(0, -1);
+        const digitoVerificador = parseInt(cedula.slice(-1));
+        let suma = 0;
+
+        for (let i = 0; i < cuerpo.length; i++) {
+          let numero = parseInt(cuerpo[i]);
+          if ((i + 1) % 2 !== 0) {
+            numero *= 1;
+          } else {
+            numero *= 2;
+            if (numero > 9) numero -= 9;
+          }
+          suma += numero;
+        }
+
+        const resto = suma % 10;
+        const verificadorCalculado = resto === 0 ? 0 : 10 - resto;
+
+        if (verificadorCalculado === digitoVerificador) {
+          mensaje.textContent = " CÉDULA ES CORRECTA ";
+          popupContent.className = "popup-content correcta";
+        } else {
+          mensaje.textContent = " CÉDULA ES INCORRECTA ";
+          popupContent.className = "popup-content incorrecta";
+        }
+
+        popup.style.display = "flex";
+      }, 1500);
+    }
+
+    function cerrarPopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
